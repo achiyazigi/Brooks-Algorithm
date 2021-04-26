@@ -443,4 +443,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             }
         }
     }
+
+    @Override
+    public void BrookColoring() {
+        // TODO Auto-generated method stub
+        
+    }
 }

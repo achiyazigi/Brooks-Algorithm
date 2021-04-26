@@ -78,5 +78,5 @@ public interface weighted_graph_algorithms {
     public void maxMatchHungarian();
     public LinkedList<edge_info> maxMatchStep();
 
-
+    public void BrookColoring();
 }
