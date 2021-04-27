@@ -6,9 +6,9 @@ import kotlin.Pair;
 public class edge_info implements Serializable{
 
     private static final long serialVersionUID = -1532360748404142704L;
-    kotlin.Pair<Integer,Integer> nodes;
-    double value;
-    boolean inMatch;
+    private kotlin.Pair<Integer,Integer> nodes;
+    private double value;
+    private boolean inMatch;
 
     public edge_info(){}
 
