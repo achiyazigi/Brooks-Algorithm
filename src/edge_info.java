@@ -5,8 +5,7 @@ import java.io.Serializable;
 public class edge_info implements Serializable{
 
     private static final long serialVersionUID = -1532360748404142704L;
-
-    private kotlin.Pair<Integer,Integer> nodes;
+    private Pair<Integer,Integer> nodes;
     private double value;
     private boolean inMatch;
 

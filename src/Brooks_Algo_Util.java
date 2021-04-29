@@ -27,7 +27,7 @@ public class Brooks_Algo_Util {
     /**
      * simple dfs forset
      * each tree converted to subgraph
-     * NOTE! for diGraph is the future change to:
+     * NOTE! for diGraph in the future change to:
      * 1. dfs
      * 2. graph transpose
      * 3. dfs by finish order
