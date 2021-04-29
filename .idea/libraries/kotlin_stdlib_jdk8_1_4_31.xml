@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kotlin-stdlib-jdk8-1.4.31" type="kotlin.js">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/kotlin-stdlib-jdk8-1.4.31.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

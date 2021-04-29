@@ -1,3 +1,4 @@
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -87,8 +88,24 @@ public class Brooks_Algo_Util {
 
     protected void GreedyColoring(List<Integer> order){} // - nir; the only func coloring the vx’es
 
+    /***
+     * A method that check deltaG of a given graph- which is the max degree from all the node in the graph.
+     * In case we found that exist node that has a degree(node)=|V|-1 so just return that.
+     * @param g-the graph we work on.
+     * @return deltaG
+     */
     protected int deltaG(weighted_graph g){ // - Kafka
-        return 0;
+        int maxDegree=0;
+        for (node_info node: g.getV()) {
+            int degree=g.getV(node.getKey()).size();
+            if(maxDegree<degree){
+                maxDegree=degree;
+                if(maxDegree==g.getV().size()-1){
+                    return maxDegree;
+                }
+            }
+        }
+        return maxDegree;
     } 
     protected boolean isOddCycle(weighted_graph g){ // - itai
         return false;
@@ -104,9 +121,45 @@ public class Brooks_Algo_Util {
     protected List<Integer> spanningTreeOrder(weighted_graph g, int root){ // - Evyatar
         return new LinkedList<Integer>();
     }
+
+    /***
+     * A method that check if kappaG of a given graph is one.
+     * By removing each node and checking if the graph still connected.
+     * To avoid mistakes before we remove node we hold a collection of all his neighbor to enable reconnecting the graph.
+     * @param g-the graph we work on.
+     * @return - key node or -1 if there is no such a node.
+     */
     protected int isOneConnected(weighted_graph g){// - Kafka returns -1 if false
+        weighted_graph_algorithms ga=new WGraph_Algo();
+        ga.init(g);
+        Collection<node_info> prevConnections;
+        weighted_graph gCopy=ga.copy();
+        ga.init(gCopy);
+        for (node_info node:g.getV()) {
+            prevConnections=g.getV(node.getKey());
+            gCopy.removeNode(node.getKey());
+            if(!ga.isConnected()){
+                return node.getKey();
+            }
+            reConnect(gCopy, node.getKey(), prevConnections);
+
+        }
+
         return -1;
-    } 
+    }
+
+    /***
+     * Re connect the graph when we want to re add a node to the graph with his previous connections.
+     * @param g -the graph we work on.
+     * @param k -node to re add.
+     * @param prevConnections -node's previous connections.
+     */
+    private void reConnect(weighted_graph g,int k,Collection<node_info> prevConnections){
+        g.addNode(k);
+        for (node_info node:prevConnections) {
+            g.connect(k, node.getKey(), 1);
+        }
+    }
     protected void handleOneConnected(weighted_graph g, int sep){} // - Zigler 
 
     /**
