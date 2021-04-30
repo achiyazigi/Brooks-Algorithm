@@ -115,7 +115,7 @@ public class Brooks_Algo_Util_test {
     	assertFalse(g.hasEdge(y, z));
     	
     	g.removeNode(z);
-    	g.addNode(y);
+    	g.removeNode(y);
     	weighted_graph_algorithms ga = new WGraph_Algo();
     	ga.init(g);
     	
