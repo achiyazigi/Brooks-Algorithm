@@ -1,7 +1,11 @@
 import org.junit.jupiter.api.Test;
 
+import com.sun.source.tree.AssertTree;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Brooks_Algo_Util_test {
@@ -60,6 +64,78 @@ public class Brooks_Algo_Util_test {
         connectToAll(g,8);
         assertEquals(-1,ba.isOneConnected(g));
 
+    }
+    
+    @Test
+    void Greedy_Algo() {
+    	
+    	weighted_graph g = new WGraph_DS();
+    	for(int i = 0; i < 5; i++) {g.addNode(i);}
+    	for(int i = 0; i < 5; i++) {g.connect(i, (i+1)%5, 0);}
+    	List<Integer> order = new LinkedList<Integer>();
+    	for(int i = 0; i < 5; i++) {order.add(i);}
+    	
+    	Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+    	ba.GreedyColoring(order);
+    	
+    	
+    	assertEquals(1, g.getNode(0).getColor());
+    	assertEquals(2, g.getNode(1).getColor());
+    	assertEquals(1, g.getNode(2).getColor());
+    	assertEquals(2, g.getNode(3).getColor());
+    	assertEquals(3, g.getNode(4).getColor());
+    	
+    	weighted_graph g1 = graph_creator(4);
+    	g1.connect(0, 1, 0);
+    	g1.connect(0, 2, 0);
+    	g1.connect(1, 2, 0);
+    	g1.connect(2, 3, 0);
+    	
+    	List<Integer> order1 = new LinkedList<Integer>();
+    	order1.add(2); order1.add(1); order1.add(0); order1.add(3);
+    	Brooks_Algo_Util ba1 = new Brooks_Algo_Util(g1);
+    	ba1.GreedyColoring(order1);
+    	
+    	assertEquals(3, g1.getNode(0).getColor());
+    	assertEquals(2, g1.getNode(1).getColor());
+    	assertEquals(1, g1.getNode(2).getColor());
+    	assertEquals(2, g1.getNode(3).getColor());
+    }
+    
+    @Test
+    void XYZ() {
+    	
+    	weighted_graph g = make_k_n_n(3);
+    	Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+    	int[] xyz = ba.XYZ(g);
+    	int x = xyz[0], y = xyz[1], z = xyz[2];
+    	
+    	assertTrue(g.hasEdge(x, y));
+    	assertTrue(g.hasEdge(x, z));
+    	assertFalse(g.hasEdge(y, z));
+    	
+    	g.removeNode(z);
+    	g.addNode(y);
+    	weighted_graph_algorithms ga = new WGraph_Algo();
+    	ga.init(g);
+    	
+    	assertTrue(ga.isConnected());
+    }
+    
+    
+    /**
+     * generate full bipartite graph with n vx on each side
+     * @param n
+     * @return
+     */
+    private static weighted_graph make_k_n_n(int n) {
+    	weighted_graph g = graph_creator(2*n);
+    	for(int i = 0; i < n; i++) {
+    		for(int j = n; j < 2*n; j++) {
+    			g.connect(i, j, 0);
+    		}
+    	}
+    	return g;
     }
 
     /***
