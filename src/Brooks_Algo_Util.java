@@ -1,7 +1,7 @@
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import org.w3c.dom.Node;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Brooks_Algo_Util {
     
@@ -106,14 +106,126 @@ public class Brooks_Algo_Util {
             }
         }
         return maxDegree;
-    } 
-    protected boolean isOddCycle(weighted_graph g){ // - itai
-        return false;
     }
+
+    /**
+     * Checks whether a given graph is an odd cycle
+     * @param g - A connected weighted graph
+     * @return  - True if the graph is an odd cycle, false otherwise
+     */
+    protected boolean isOddCycle(weighted_graph g) { // - itai
+        if (g.nodeSize() % 2 == 0 || g.edgeSize() != g.nodeSize()) {
+            return false;
+        }
+        for (node_info node : g.getV()) {
+            int degree = g.getV(node.getKey()).size();
+            if (degree != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected boolean isClique(weighted_graph g){ // - Evyater
         return false;
-    } 
-    protected  void handleDeltaTwo(weighted_graph g){} // - itai only order considered to Greedy
+    }
+
+    /**
+     * Defines the arrangement of the vertices in a graph (even cycle or path)
+     * and sends them to the GreedyColoring methods.
+     * In a path graph and an even cycle graph the coloring is simple (2-coloring)
+     * so all it has to do is to arrange the vertices and send them for coloring.
+     * @param g - A graph that is a path or an even cycle
+     */
+    protected void handleDeltaTwo(weighted_graph g){ // - itai only order considered to Greedy
+        List<Integer> nodesOrder;
+        if(isEvenCycle(g)){
+            nodesOrder = cycleOrder(g);
+        }
+        else{
+            nodesOrder = pathOrder(g);
+        }
+        GreedyColoring(nodesOrder);
+    }
+
+    /**
+     * Checks whether the graph is an even cycle
+     * @param g - A weighted graph
+     * @return  - True if the graph is an even cycle, false otherwise
+     */
+    private boolean isEvenCycle(weighted_graph g){
+        if (g.nodeSize() % 2 != 0 || g.edgeSize() != g.nodeSize()) {
+            return false;
+        }
+        for (node_info node : g.getV()) {
+            int degree = g.getV(node.getKey()).size();
+            if (degree != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Defines the arrangement of the vertices in an even cycle graph
+     * @param cycle - A graph that is an even cycle
+     * @return  - List of nodes
+     */
+    private List<Integer> cycleOrder(weighted_graph cycle){
+        List<Integer> nodesOrder = new ArrayList<>();
+        node_info first = cycle.getV().iterator().next();
+        nodesOrder.add(first.getKey());
+        int index = 0;
+        while(nodesOrder.size() < cycle.nodeSize()){
+            Collection<node_info> neighbors = cycle.getV(nodesOrder.get(index));
+            for(node_info current : neighbors){
+                if(nodesOrder.size() == 1){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+            }
+        }
+        return nodesOrder;
+    }
+
+    /**
+     * Defines the arrangement of the vertices in a path graph
+     * @param path - A path graph
+     * @return  - List of nodes
+     */
+    private List<Integer> pathOrder(weighted_graph path){
+        List<Integer> nodesOrder = new ArrayList<>();
+        node_info first = null;
+        for (node_info node : path.getV()) {
+            if (path.getV(node.getKey()).size() == 1) {
+                first = node;
+            }
+        }
+        nodesOrder.add(first.getKey());
+        int index = 0;
+        while(nodesOrder.size() < path.nodeSize()){
+            Collection<node_info> neighbors = path.getV(nodesOrder.get(index));
+            for(node_info current : neighbors){
+                if(nodesOrder.size() == 1){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+            }
+        }
+        return nodesOrder;
+    }
 
     protected int findRoot(weighted_graph g){ // - Zigler
         return 0;
