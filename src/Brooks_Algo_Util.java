@@ -157,11 +157,15 @@ public class Brooks_Algo_Util {
         List<Integer> nodesOrder;
         if(isEvenCycle(g)){
             nodesOrder = cycleOrder(g);
+            GreedyColoring(nodesOrder);
+        }
+        else if(isPath(g)){
+            nodesOrder = pathOrder(g);
+            GreedyColoring(nodesOrder);
         }
         else{
-            nodesOrder = pathOrder(g);
+            throw new IllegalArgumentException("handleDeltaTwo method handle only path and even cycle graph!");
         }
-        GreedyColoring(nodesOrder);
     }
 
     /**
@@ -183,6 +187,31 @@ public class Brooks_Algo_Util {
     }
 
     /**
+     * Checks whether the graph is a path
+     * @param g - A weighted graph
+     * @return  - True if the graph is a path, false otherwise
+     */
+    private boolean isPath(weighted_graph g){
+        if (g.edgeSize() != g.nodeSize() - 1) {
+            return false;
+        }
+        int degreeOne = 0, degreeTwo = 0;
+        for (node_info node : g.getV()) {
+            int degree = g.getV(node.getKey()).size();
+            if(degree == 1){
+                degreeOne++;
+            }
+            else if(degree == 2){
+                degreeTwo++;
+            }
+            else {
+                return false;
+            }
+        }
+        return degreeOne == 2 && degreeTwo == g.nodeSize()-2;
+    }
+
+    /**
      * Defines the arrangement of the vertices in an even cycle graph
      * @param cycle - A graph that is an even cycle
      * @return  - List of nodes
@@ -191,16 +220,11 @@ public class Brooks_Algo_Util {
         List<Integer> nodesOrder = new ArrayList<>();
         node_info first = cycle.getV().iterator().next();
         nodesOrder.add(first.getKey());
-        int index = 0;
+        int index = 1;
         while(nodesOrder.size() < cycle.nodeSize()){
-            Collection<node_info> neighbors = cycle.getV(nodesOrder.get(index));
+            Collection<node_info> neighbors = cycle.getV(nodesOrder.get(index-1));
             for(node_info current : neighbors){
-                if(nodesOrder.size() == 1){
-                    nodesOrder.add(current.getKey());
-                    index++;
-                    break;
-                }
-                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                if(nodesOrder.size() == 1 || current.getKey() != nodesOrder.get(index-2)){
                     nodesOrder.add(current.getKey());
                     index++;
                     break;
@@ -219,21 +243,14 @@ public class Brooks_Algo_Util {
         List<Integer> nodesOrder = new ArrayList<>();
         node_info first = null;
         for (node_info node : path.getV()) {
-            if (path.getV(node.getKey()).size() == 1) {
-                first = node;
-            }
+            if (path.getV(node.getKey()).size() == 1) { first = node; }
         }
         nodesOrder.add(first.getKey());
-        int index = 0;
+        int index = 1;
         while(nodesOrder.size() < path.nodeSize()){
-            Collection<node_info> neighbors = path.getV(nodesOrder.get(index));
+            Collection<node_info> neighbors = path.getV(nodesOrder.get(index-1));
             for(node_info current : neighbors){
-                if(nodesOrder.size() == 1){
-                    nodesOrder.add(current.getKey());
-                    index++;
-                    break;
-                }
-                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                if(nodesOrder.size() == 1 || current.getKey() != nodesOrder.get(index-2)){
                     nodesOrder.add(current.getKey());
                     index++;
                     break;
