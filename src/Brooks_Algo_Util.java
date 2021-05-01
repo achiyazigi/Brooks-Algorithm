@@ -1,10 +1,10 @@
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import org.w3c.dom.Node;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Brooks_Algo_Util {
-    
+
     private weighted_graph g;
 
     /**
@@ -40,7 +40,7 @@ public class Brooks_Algo_Util {
 
         //dfs
         for (node_info n : this.g.getV()) {
-            
+
             if(n.getTag() != 1){ // new tree in dfs forest!
                 comp = this.dfs_visit(n);
                 res.add(createSubGraph(comp)); // convertion keys -> graph
@@ -67,26 +67,42 @@ public class Brooks_Algo_Util {
     }
 
     private List<Integer> dfs_visit(node_info n) {
-            Stack<node_info> nodes = new Stack<>();
-            LinkedList<Integer> comp = new LinkedList<>();
-            nodes.push(n);
-            while(!nodes.isEmpty()){
-                node_info cur = nodes.pop();
-                cur.setTag(1);
-                comp.add(cur.getKey());
-                for (node_info ni: g.getV(cur.getKey())) {
-                    if(ni.getTag() != 1){
-                        nodes.push(ni);
-                    }
+        Stack<node_info> nodes = new Stack<>();
+        LinkedList<Integer> comp = new LinkedList<>();
+        nodes.push(n);
+        while(!nodes.isEmpty()){
+            node_info cur = nodes.pop();
+            cur.setTag(1);
+            comp.add(cur.getKey());
+            for (node_info ni: g.getV(cur.getKey())) {
+                if(ni.getTag() != 1){
+                    nodes.push(ni);
                 }
             }
-            return comp;
+        }
+        return comp;
     }
 
     //  ===end of SCC'S functions===
 
 
-    protected void GreedyColoring(List<Integer> order){} // - nir; the only func coloring the vx’es
+    /**
+     * color the nodes of the class's graph with a greedy algorithm
+     * @param order
+     */
+    protected void GreedyColoring(List<Integer> order){
+        int color;
+        HashSet<Integer> setOfNeiColors = new HashSet<Integer>();
+        for(int node_id : order){   // for each node in the list
+            setOfNeiColors.clear();	// make a list of it's neighbors's colors
+            for (node_info nei : g.getV(node_id)){
+                setOfNeiColors.add(nei.getColor());
+            }
+            color = 1;
+            while(setOfNeiColors.contains(color)){color++;}				//find the minimum color not used by a neighbor
+            g.getNode(node_id).setColor(color);     // color the node
+        }
+    } // - nir; the only func coloring the vx’es
 
     /***
      * A method that check deltaG of a given graph- which is the max degree from all the node in the graph.
@@ -106,14 +122,126 @@ public class Brooks_Algo_Util {
             }
         }
         return maxDegree;
-    } 
-    protected boolean isOddCycle(weighted_graph g){ // - itai
-        return false;
     }
+
+    /**
+     * Checks whether a given graph is an odd cycle
+     * @param g - A connected weighted graph
+     * @return  - True if the graph is an odd cycle, false otherwise
+     */
+    protected boolean isOddCycle(weighted_graph g) { // - itai
+        if (g.nodeSize() % 2 == 0 || g.edgeSize() != g.nodeSize()) {
+            return false;
+        }
+        for (node_info node : g.getV()) {
+            int degree = g.getV(node.getKey()).size();
+            if (degree != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected boolean isClique(weighted_graph g){ // - Evyater
         return false;
-    } 
-    protected  void handleDeltaTwo(weighted_graph g){} // - itai only order considered to Greedy
+    }
+
+    /**
+     * Defines the arrangement of the vertices in a graph (even cycle or path)
+     * and sends them to the GreedyColoring methods.
+     * In a path graph and an even cycle graph the coloring is simple (2-coloring)
+     * so all it has to do is to arrange the vertices and send them for coloring.
+     * @param g - A graph that is a path or an even cycle
+     */
+    protected void handleDeltaTwo(weighted_graph g){ // - itai only order considered to Greedy
+        List<Integer> nodesOrder;
+        if(isEvenCycle(g)){
+            nodesOrder = cycleOrder(g);
+        }
+        else{
+            nodesOrder = pathOrder(g);
+        }
+        GreedyColoring(nodesOrder);
+    }
+
+    /**
+     * Checks whether the graph is an even cycle
+     * @param g - A weighted graph
+     * @return  - True if the graph is an even cycle, false otherwise
+     */
+    private boolean isEvenCycle(weighted_graph g){
+        if (g.nodeSize() % 2 != 0 || g.edgeSize() != g.nodeSize()) {
+            return false;
+        }
+        for (node_info node : g.getV()) {
+            int degree = g.getV(node.getKey()).size();
+            if (degree != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Defines the arrangement of the vertices in an even cycle graph
+     * @param cycle - A graph that is an even cycle
+     * @return  - List of nodes
+     */
+    private List<Integer> cycleOrder(weighted_graph cycle){
+        List<Integer> nodesOrder = new ArrayList<>();
+        node_info first = cycle.getV().iterator().next();
+        nodesOrder.add(first.getKey());
+        int index = 0;
+        while(nodesOrder.size() < cycle.nodeSize()){
+            Collection<node_info> neighbors = cycle.getV(nodesOrder.get(index));
+            for(node_info current : neighbors){
+                if(nodesOrder.size() == 1){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+            }
+        }
+        return nodesOrder;
+    }
+
+    /**
+     * Defines the arrangement of the vertices in a path graph
+     * @param path - A path graph
+     * @return  - List of nodes
+     */
+    private List<Integer> pathOrder(weighted_graph path){
+        List<Integer> nodesOrder = new ArrayList<>();
+        node_info first = null;
+        for (node_info node : path.getV()) {
+            if (path.getV(node.getKey()).size() == 1) {
+                first = node;
+            }
+        }
+        nodesOrder.add(first.getKey());
+        int index = 0;
+        while(nodesOrder.size() < path.nodeSize()){
+            Collection<node_info> neighbors = path.getV(nodesOrder.get(index));
+            for(node_info current : neighbors){
+                if(nodesOrder.size() == 1){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+                else if(nodesOrder.size() > 1 && current.getKey() != nodesOrder.get(index-1)){
+                    nodesOrder.add(current.getKey());
+                    index++;
+                    break;
+                }
+            }
+        }
+        return nodesOrder;
+    }
 
     protected int findRoot(weighted_graph g){ // - Zigler
         return 0;
@@ -160,7 +288,7 @@ public class Brooks_Algo_Util {
             g.connect(k, node.getKey(), 1);
         }
     }
-    protected void handleOneConnected(weighted_graph g, int sep){} // - Zigler 
+    protected void handleOneConnected(weighted_graph g, int sep){} // - Zigler
 
     /**
      * ===from this point:===
@@ -170,9 +298,40 @@ public class Brooks_Algo_Util {
      *    G not clicke
      */
 
+    /**
+     * find 3 node [x,y,z] where (x,y),(x,z) in E(G), (z,y) not in E(G), and g/{z,y} is connected
+     * @param g - connected graph
+     * @return [x_id, y_id, z_id]
+     */
     protected int[] XYZ(weighted_graph g){ // - nir (first is x)
-        return new int[3];
+        weighted_graph_algorithms ga = new WGraph_Algo();
+
+        for(node_info x : g.getV()) {				// check every triple
+            for(node_info y : g.getV()) {
+                for(node_info z : g.getV()) {
+                    // if is cherry
+                    if(x!=y && x!=z && z!=y &&
+                            g.hasEdge(x.getKey(), y.getKey()) &&
+                            g.hasEdge(x.getKey(), z.getKey()) &&
+                            !g.hasEdge(y.getKey(), z.getKey())) {
+
+                        ga.init(g);
+                        weighted_graph copy = ga.copy();			// 'remove' y and z
+                        copy.removeNode(y.getKey());
+                        copy.removeNode(z.getKey());
+                        ga.init(copy);
+                        if(ga.isConnected()) {						// if connected, return the current triple
+                            int[] result = {x.getKey(), y.getKey(), z.getKey()};
+                            return result;
+                        }
+                    }
+
+                }
+            }
+        }
+        return null;
     }
+
     protected void handleXYZcase(weighted_graph g){} // - Zigler
 
 }
