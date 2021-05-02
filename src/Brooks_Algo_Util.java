@@ -141,9 +141,19 @@ public class Brooks_Algo_Util {
         }
         return true;
     }
-
-    protected boolean isClique(weighted_graph g){ // - Evyater
-        return false;
+    /**
+     * 
+     * @param g - graph 
+     * @return true - if the graph is clique, otherwise false
+     */
+    protected boolean isClique(weighted_graph g){ // - Eviatar
+        int number_neighbrhood = g.getV().size() -1; //in clique graph have number of nodes -1 neigberhoods
+        for(node_info node: g.getV()) {		//move on all the neighberhood
+        	if(g.getV(node.getKey()).size() != number_neighbrhood) {
+        		return false;
+        	}
+        }
+        return true;
     }
 
     /**
@@ -276,10 +286,76 @@ public class Brooks_Algo_Util {
         }
         return -1;
     }
-    protected List<Integer> spanningTreeOrder(weighted_graph g, int root){ // - Evyatar
-        return new LinkedList<Integer>();
+    /**
+     * @param g- graph that need to do on him spaning tree
+     * @param root - from where to start the spanning tree
+     * @return list - an order of the nodes as the last node is the root
+     **/
+    protected List<Integer> spanningTreeOrder(weighted_graph g, int root){ // - Eviatar
+    	weighted_graph ch = new WGraph_DS();
+    	for(node_info node:g.getV()) {	 //create new graph with the same nodes 
+    		ch.addNode(node.getKey());
+    	}
+    	
+    	bfs(root,ch, g);	//take two random nodes
+    	for(node_info node: ch.getV()) {
+    		node.setTag(-1);  		// yet didn't visit him using in postOrderTraversal
+    	}
+    	ch.getNode(root).setTag(0);	
+    	LinkedList<Integer> list = new LinkedList<Integer>();
+    	postOrderTraveral(root,ch,list);  
+        return list;
     }
+    
+	/**
+	 * @param get src and dest
+	 * the run time of this function is o(v+e)
+	 * sign in the tag of every node the distance from the src 
+	 * and if havn't path to which node her tag will be with -1
+	 * the run time of this function is o(v+e)
+	 */
+	private void bfs(int src,weighted_graph ch, weighted_graph original) {
+		if(original.getV().isEmpty())								//check if it is empty graph
+			return;
+		
+		for(node_info keys : original.getV()) {						//initial the tag's nodes- O(V)
+			keys.setTag(-1);
+		}
+		Queue<Integer> queue=new LinkedList<Integer>();
+		queue.add(original.getNode(src).getKey());				//keep the key in the queue
+		original.getNode(src).setTag(0);				//the first node init with 0 										
+		ch.getNode(src).setTag(0);
+		
+		while(!queue.isEmpty()) {
+			Integer loc=queue.poll();
+				if(original.getV(loc).isEmpty() == false) {			//check if have neighbors for the specific node
+					for(node_info key : this.g.getV(loc)) {
+						if(key.getTag() == -1) {
+							queue.add(key.getKey());
+							key.setTag(original.getNode(loc).getTag()+1);			//if have neighbor update the the tag according to his parent
+							ch.connect(loc, key.getKey(), 0);
+						}
+				}
+			}
+		}
+	}
+	/**
+	 * 
+	 * @param root - from to start the postorder traversal
+	 * @param ch - the new graph - spanning graph
+	 * @param list - list that contain the postroder traversal on the nodes
+	 */
+	public void postOrderTraveral(int root, weighted_graph ch,LinkedList<Integer> list) {
 
+		for(node_info node: ch.getV(root)){ //move on all his neighbors
+			if(node.getTag() == -1) {
+				node.setTag(0);
+				postOrderTraveral(node.getKey(), ch, list);
+			}
+		}
+		list.add(root);
+	}
+	
     /***
      * A method that check if kappaG of a given graph is one.
      * By removing each node and checking if the graph still connected.
