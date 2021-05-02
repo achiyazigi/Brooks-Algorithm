@@ -1,7 +1,7 @@
-import org.w3c.dom.Node;
 
-import java.lang.reflect.Array;
 import java.util.*;
+
+import kotlin.Pair;
 
 public class Brooks_Algo_Util {
 
@@ -260,8 +260,21 @@ public class Brooks_Algo_Util {
         return nodesOrder;
     }
 
-    protected int findRoot(weighted_graph g){ // - Zigler
-        return 0;
+    /**
+     * 
+     * @param local_g
+     * @return a node key with degree less than deltaG, -1 d-regular
+     */
+    protected int findRoot(weighted_graph local_g){ // - Zigler
+        int delta = this.deltaG(local_g);
+        int node_key;
+        for(node_info n : local_g.getV()){
+            node_key = n.getKey();
+            if(local_g.getV(node_key).size() < delta){
+                return node_key;
+            }
+        }
+        return -1;
     }
     protected List<Integer> spanningTreeOrder(weighted_graph g, int root){ // - Evyatar
         return new LinkedList<Integer>();
@@ -305,8 +318,39 @@ public class Brooks_Algo_Util {
             g.connect(k, node.getKey(), 1);
         }
     }
-    protected void handleOneConnected(weighted_graph g, int sep){} // - Zigler
+    protected void handleOneConnected(weighted_graph local_g, int sep) throws Exception{
+        HashSet<Integer> sep_nei = new HashSet<>();
+        for(node_info n: local_g.getV(sep)){
+            sep_nei.add(n.getKey());
+        }
+        
+        local_g.removeNode(sep);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util(local_g);
+        List<weighted_graph> seperated = ba.SCC();
+        if(seperated.size() > 2){
+            throw new Exception("local_g isn't OneConnected");
+        }
+        for (weighted_graph part_of_g : seperated) {
+            part_of_g.addNode(sep);
+            for (int potential_nei : sep_nei) {
+                part_of_g.connect(sep, potential_nei, 1);
+            }
+        }
+        List<Integer> part_one = this.spanningTreeOrder(seperated.get(0), sep);
+        List<Integer> part_two = this.spanningTreeOrder(seperated.get(1), sep);
+        this.GreedyColoring(part_one);
+        this.GreedyColoring(part_two);
+        node_info sep_in_one = seperated.get(0).getNode(sep);
+        node_info sep_in_two = seperated.get(1).getNode(sep);
+        if(sep_in_one.getColor() == sep_in_two.getColor()){
+            SwitchColorsToFit(sep_in_two, sep);
+        }
 
+    } // - Zigler
+
+    private static void SwitchColorsToFit(node_info sep_in_two, int sep) {
+        // to be done after testing the above, implementation of spanningTreeOrder needed
+    }
     /**
      * ===from this point:===
      *      kappaG >=2
@@ -314,6 +358,7 @@ public class Brooks_Algo_Util {
      *      d >= 3
      *    G not clicke
      */
+
 
     /**
      * find 3 node [x,y,z] where (x,y),(x,z) in E(G), (z,y) not in E(G), and g/{z,y} is connected

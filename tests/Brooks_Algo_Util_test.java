@@ -1,10 +1,8 @@
 import org.junit.jupiter.api.Test;
 
-import com.sun.source.tree.AssertTree;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -122,7 +120,56 @@ public class Brooks_Algo_Util_test {
     	assertTrue(ga.isConnected());
     }
     
-    
+    @Test
+    public void findRoot(){
+        weighted_graph g = graph_creator(100);
+        for (int i = 0; i < g.nodeSize(); i++) {
+            
+            connectToAll(g, i);
+        }
+        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        assertEquals(-1, ba.findRoot(g));
+        g.removeEdge(50, 51);
+        int root_key = ba.findRoot(g);
+        assertTrue(root_key ==51 || root_key == 50);
+        g.removeEdge(50, 52);
+        root_key = ba.findRoot(g);
+        assertTrue(root_key ==50);
+        for (int i = 1; i < g.nodeSize(); i++) {
+            g.removeEdge(0, i);
+        }
+        root_key = ba.findRoot(g);
+        assertTrue(root_key == 0 || root_key == 50 || root_key == 51);
+    }
+
+    @Test
+    public void handleOneConnected(){
+        weighted_graph g = graph_creator(9);
+        for (int i = 0; i < g.nodeSize(); i++) {
+            g.connect(i, 4, 1);
+        }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                g.connect(i, j, 1);
+            }
+        }
+        for (int i = 5; i < g.nodeSize(); i++) {
+            for (int j = 5; j < g.nodeSize(); j++) {
+                g.connect(i, j, 1);
+            }
+        }
+
+        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        try{
+
+            ba.handleOneConnected(g, 4);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        printColoring(g); // not a real test, wating for implementation of spanningTreeOrder.
+    }
+
     /**
      * generate full bipartite graph with n vx on each side
      * @param n
@@ -188,5 +235,11 @@ public class Brooks_Algo_Util_test {
 
 
         return g0;
+    }
+
+    private static void printColoring(weighted_graph g){
+        for (node_info  n : g.getV()) {
+            System.out.print("(key: " + n.getKey() + ", color: " + n.getColor() + ") ");
+        }
     }
 }
