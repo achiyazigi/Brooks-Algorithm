@@ -242,4 +242,59 @@ public class Brooks_Algo_Util_test {
             System.out.print("(key: " + n.getKey() + ", color: " + n.getColor() + ") ");
         }
     }
+    @Test
+    public void spanning_tree(){
+    	weighted_graph ch =new WGraph_DS();
+    	ch.addNode(0);
+    	ch.addNode(1);
+    	ch.addNode(2);
+    	ch.addNode(3);
+    	ch.addNode(4);
+    	ch.addNode(5);
+    	ch.connect(0, 1, 0);
+    	ch.connect(0, 2, 0);
+    	ch.connect(1, 3, 0);
+    	ch.connect(1, 4, 0);
+    	ch.connect(1, 5, 0);
+    	ch.connect(1, 2, 0);
+    	ch.connect(2, 4, 0);
+    	ch.connect(2, 3, 0);
+    	ch.connect(3, 5, 0);
+    	ch.connect(3, 4, 0);
+    	ch.connect(4, 5, 0);
+    	ch.connect(0, 5, 0);
+    	Brooks_Algo_Util alg = new Brooks_Algo_Util(ch);
+    	LinkedList<Integer> list = new LinkedList<Integer>();
+    	//check if the root return at the last of the linked list
+    	list = (LinkedList<Integer>) alg.spanningTreeOrder(ch, 0);
+    	assertTrue(list.getLast() == 0);
+     	list = (LinkedList<Integer>) alg.spanningTreeOrder(ch, 1);
+    	assertTrue(list.getLast() == 1);
+     	list = (LinkedList<Integer>) alg.spanningTreeOrder(ch, 5);
+    	assertTrue(list.getLast() == 5);
+     	list = (LinkedList<Integer>) alg.spanningTreeOrder(ch, 3);
+    	assertTrue(list.getLast() == 3);
+    	
+    }
+    @Test
+    public void is_clique(){
+    	weighted_graph ch =new WGraph_DS();
+    	ch.addNode(0);
+    	ch.addNode(1);
+    	ch.addNode(2);
+    	ch.addNode(3);
+    	ch.connect(0, 1, 0);
+    	ch.connect(0, 2, 0);
+    	ch.connect(0, 3, 0);
+    	ch.connect(2, 3, 0);
+    	ch.connect(2, 1, 0);
+    	ch.connect(1, 3, 0);
+
+    	Brooks_Algo_Util alg = new Brooks_Algo_Util(ch);
+    	assertTrue(alg.isClique(ch));
+    	
+    	ch.removeEdge(0, 1);
+    	assertFalse(alg.isClique(ch));
+
+    }
 }
