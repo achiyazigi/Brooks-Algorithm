@@ -1,7 +1,6 @@
 
 import java.util.*;
 
-import kotlin.Pair;
 
 public class Brooks_Algo_Util {
 
@@ -333,7 +332,7 @@ public class Brooks_Algo_Util {
 		while(!queue.isEmpty()) {
 			Integer loc=queue.poll();
 				if(original.getV(loc).isEmpty() == false) {			//check if have neighbors for the specific node
-					for(node_info key : this.g.getV(loc)) {
+					for(node_info key : original.getV(loc)) {
 						if(key.getTag() == -1) {
 							queue.add(key.getKey());
 							key.setTag(original.getNode(loc).getTag()+1);			//if have neighbor update the the tag according to his parent
@@ -407,6 +406,7 @@ public class Brooks_Algo_Util {
         local_g.removeNode(sep);
         Brooks_Algo_Util ba = new Brooks_Algo_Util(local_g);
         List<weighted_graph> seperated = ba.SCC();
+        local_g.addNode(sep);
         if(seperated.size() > 2){
             throw new Exception("local_g isn't OneConnected");
         }
@@ -414,22 +414,45 @@ public class Brooks_Algo_Util {
             part_of_g.addNode(sep);
             for (int potential_nei : sep_nei) {
                 part_of_g.connect(sep, potential_nei, 1);
+                local_g.connect(sep, potential_nei, 1);
             }
         }
         List<Integer> part_one = this.spanningTreeOrder(seperated.get(0), sep);
         List<Integer> part_two = this.spanningTreeOrder(seperated.get(1), sep);
         this.GreedyColoring(part_one);
+        node_info sep_in_g = g.getNode(sep);
+        int root_color = sep_in_g.getColor(); // keep the root's color before coloring the 2nd part
+        int hc1 = get_highest_color(seperated.get(0));
         this.GreedyColoring(part_two);
-        node_info sep_in_one = seperated.get(0).getNode(sep);
-        node_info sep_in_two = seperated.get(1).getNode(sep);
-        if(sep_in_one.getColor() == sep_in_two.getColor()){
-            SwitchColorsToFit(sep_in_two, sep);
+        int hc2 = get_highest_color(seperated.get(1));
+        int hc = Math.max(hc1, hc2);
+        if(root_color != sep_in_g.getColor()){ // the color of sep came out differently
+            SwitchColorsToFit(seperated.get(1), sep, root_color, hc); // missmatch of colors in 2nd part of local g
         }
 
     } // - Zigler
 
-    private static void SwitchColorsToFit(node_info sep_in_two, int sep) {
-        // to be done after testing the above, implementation of spanningTreeOrder needed
+    private void SwitchColorsToFit(weighted_graph local_g, int sep, int disired_root_color, int hc) {
+        int factor = disired_root_color - g.getNode(sep).getColor();
+        for (node_info v : local_g.getV()) {
+            node_info original_v = g.getNode(v.getKey());
+            original_v.setColor(switch_func(original_v.getColor(), hc, factor));
+        }
+    }
+
+    public int get_highest_color(weighted_graph local_g) {
+        int max = 0;
+        for (node_info v : local_g.getV()) {
+            int cur_color = g.getNode(v.getKey()).getColor();
+            if(cur_color > max){
+                max = cur_color;
+            }
+        }
+        return max;
+    }
+
+    private static int switch_func(int color, int hc, int factor) {
+        return (color + factor)%(hc + 1);
     }
     /**
      * ===from this point:===
@@ -438,6 +461,7 @@ public class Brooks_Algo_Util {
      *      d >= 3
      *    G not clicke
      */
+
 
 
     /**

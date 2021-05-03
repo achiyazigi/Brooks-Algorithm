@@ -146,7 +146,7 @@ public class Brooks_Algo_Util_test {
     public void handleOneConnected(){
         weighted_graph g = graph_creator(9);
         for (int i = 0; i < g.nodeSize(); i++) {
-            g.connect(i, 4, 1);
+            g.connect(i, 4, 1); // seperator is 4
         }
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -160,14 +160,31 @@ public class Brooks_Algo_Util_test {
         }
 
         Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
-        try{
+        try{ // case1: seperator has the same color in both parts (easy)
 
             ba.handleOneConnected(g, 4);
         }
         catch(Exception e){
             System.out.println(e.getMessage());
         }
-        printColoring(g); // not a real test, wating for implementation of spanningTreeOrder.
+        assertTrue(legalColoring(g));
+        assertTrue(ba.get_highest_color(g) <= ba.deltaG(g));
+
+
+        g.addNode((int)g.getHighest_key()+1); // adding 1 node
+        for (int i = 0; i <= 4; i++) {
+            g.connect(i, (int)g.getHighest_key(), 1); // connecting it with all nodes in the 1st part
+        }
+        
+        try{ // case2: seperator has different color in each part (hard)
+            
+            ba.handleOneConnected(g, 4);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        assertTrue(legalColoring(g));
+        assertTrue(ba.get_highest_color(g) <= ba.deltaG(g));
     }
 
     /**
@@ -241,7 +258,21 @@ public class Brooks_Algo_Util_test {
         for (node_info  n : g.getV()) {
             System.out.print("(key: " + n.getKey() + ", color: " + n.getColor() + ") ");
         }
+        System.out.println();
     }
+
+    private static boolean legalColoring(weighted_graph g){
+        for (node_info u : g.getV()) {
+            int u_color = u.getColor();
+            for (node_info v : g.getV(u.getKey())){
+                if(u_color == v.getColor()){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Test
     public void spanning_tree(){
     	weighted_graph ch =new WGraph_DS();
@@ -295,6 +326,5 @@ public class Brooks_Algo_Util_test {
     	
     	ch.removeEdge(0, 1);
     	assertFalse(alg.isClique(ch));
-
     }
 }
