@@ -18,6 +18,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     private int lastMC;
     private HashSet<edge_info> match = new HashSet<>();
     private kotlin.Pair<Collection<node_info>, Collection<node_info>> ab;
+    Brooks_Algo_Util ba;
 
     /**
      * Graph to initialize.
@@ -29,7 +30,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         this.g = g;
         lastMC = 0;
         this.updateMatch();
-
+        ba = new Brooks_Algo_Util(g);
     }
 
     /**
@@ -446,7 +447,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     @Override
     public void BrookColoring() {
-        // TODO Auto-generated method stub
+        ba.GreedyColoring(ba.spanningTreeOrder(g, g.getHighest_key())); // temporary
         
     }
 }

@@ -98,7 +98,7 @@ public class WGraph_DS implements weighted_graph, Serializable{
     private HashMap<Integer,node_info> v;
     private HashMap<Integer,HashMap<node_info,edge_info>> e;
     private int MC;
-    private long highest_key;
+    private int highest_key;
     private int edges;
 
     public WGraph_DS(){
@@ -329,11 +329,11 @@ public class WGraph_DS implements weighted_graph, Serializable{
         return res+"}";
     }
 
-    public long getHighest_key() {
+    public int getHighest_key() {
         return highest_key;
     }
 
-    public void setHighest_key(long highest_key) {
+    public void setHighest_key(int highest_key) {
         this.highest_key = highest_key;
     }
 

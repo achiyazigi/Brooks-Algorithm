@@ -233,6 +233,11 @@ public class Gui extends JFrame{
 
             }
             drawGraph(canvas);
+            Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+            for (int i = 1; i <= ba.get_highest_color(g); i++) {
+                canvas.setColor(new Color((100 * i)%230,(200 * i)%230,(300 * i)%230));
+                canvas.drawOval(20 * i, getHeight() - 30, 10, 10);
+            }
         }
         /** 
          * draw the graph
@@ -257,7 +262,8 @@ public class Gui extends JFrame{
          * @param canvas
          */
         private void drawNode(node_info n, int r, Graphics canvas) {
-            
+            int n_color = n.getColor();
+            canvas.setColor(new Color((100 * n_color)%230,(200 * n_color)%230,(300 * n_color)%230));
             canvas.fillOval(n.X() - r, n.Y() - r, 2 * r, 2 * r);
             canvas.drawString("" + n.getKey(), n.X() - r, n.Y()- 2 * r);
 
@@ -414,6 +420,7 @@ public class Gui extends JFrame{
         JButton ConnectButton = new JButton("Connect");
         JButton disconnectButton = new JButton("Disconnect");
         this.maxMatch_hungarianButton = new JButton("Max Match");
+        JButton brooksColoring = new JButton("Brook's coloring");
         
         JTextArea console_output_area = new JTextArea();
         JTextAreaOutputStream stream = new JTextAreaOutputStream(console_output_area);
@@ -439,6 +446,7 @@ public class Gui extends JFrame{
         this.buttons_panel.add(disconnectButton);
         this.buttons_panel.add(maxMatch_hungarianButton);
         this.buttons_panel.add(stepByStepCheckBox);
+        this.buttons_panel.add(brooksColoring);
         
         rights_reserved_panel.add(BorderLayout.CENTER, rightsReserved);
 
@@ -496,6 +504,16 @@ public class Gui extends JFrame{
                 }
             }
             
+        });
+
+        brooksColoring.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                weighted_graph_algorithms ga = new WGraph_Algo();
+                ga.init(g);
+                ga.BrookColoring();
+                graph_panel.repaint();
+            }
         });
 
         rightsReserved.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

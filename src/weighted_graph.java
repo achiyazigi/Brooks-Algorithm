@@ -94,6 +94,6 @@ public interface weighted_graph {
      */
     public int getMC();
 
-    public long getHighest_key();
-    public void setHighest_key(long highest_key);
+    public int getHighest_key();
+    public void setHighest_key(int highest_key);
 }
