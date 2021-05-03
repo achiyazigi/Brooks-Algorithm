@@ -96,7 +96,9 @@ public class Brooks_Algo_Util {
         for(int node_id : order){   // for each node in the list
             setOfNeiColors.clear();	// make a list of it's neighbors's colors
             for (node_info nei : g.getV(node_id)){
-                setOfNeiColors.add(nei.getColor());
+            	if(order.contains(nei.getKey())) {
+            		setOfNeiColors.add(nei.getColor());
+            	}
             }
             color = 1;
             while(setOfNeiColors.contains(color)){color++;}				//find the minimum color not used by a neighbor
