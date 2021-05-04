@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class Gui extends JFrame{
     private static final long serialVersionUID = 1L;
@@ -157,7 +161,17 @@ public class Gui extends JFrame{
                     gui.repaint();
                     break;
                     
-                    
+                case "Brook's coloring":
+                    graph_algo.init(gui.g);
+                    graph_algo.BrookColoring();
+                    Set<Integer> colors = new HashSet<>();
+                    for(node_info v: gui.g.getV()){
+                        colors.add(v.getColor());
+                    }
+                    gui.graph_panel.set_colorPalet(colors);
+                    gui.graph_panel.repaint();
+                    break;
+
                 case "Save Graph":
                     fileChooser = new JFileChooser(System.getProperty("user.dir"));
                     fileChooser.setDialogTitle("Specify a file to save"); 
@@ -204,9 +218,11 @@ public class Gui extends JFrame{
         boolean onDrag = false;
         node_info src;
         Point temp_line_end;
+        Set<Integer> colorPalet;
 
         public Paint_panel(){
             super(true);
+            colorPalet = new HashSet<>();
         }
 
         // @Override
@@ -223,6 +239,10 @@ public class Gui extends JFrame{
         //     // "Switch" the old "canvas" for the new one
         //     canvas.drawImage(buffer_image, 0, 0, this);
         // }
+        
+        protected void set_colorPalet(Set<Integer> list_of_colors){
+            colorPalet = Set.copyOf(list_of_colors);
+        }
 
         @Override
         protected void paintComponent(Graphics canvas) {
@@ -233,8 +253,7 @@ public class Gui extends JFrame{
 
             }
             drawGraph(canvas);
-            Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
-            for (int i = 1; i <= ba.get_highest_color(g); i++) {
+            for (int i : colorPalet) {
                 canvas.setColor(new Color((100 * i)%230,(200 * i)%230,(300 * i)%230));
                 canvas.drawOval(20 * i, getHeight() - 30, 10, 10);
             }
@@ -263,7 +282,7 @@ public class Gui extends JFrame{
          */
         private void drawNode(node_info n, int r, Graphics canvas) {
             int n_color = n.getColor();
-            canvas.setColor(new Color((100 * n_color)%230,(200 * n_color)%230,(300 * n_color)%230));
+            canvas.setColor(new Color((111 * n_color)%230,(217 * n_color)%230,(57 * n_color)%230));
             canvas.fillOval(n.X() - r, n.Y() - r, 2 * r, 2 * r);
             canvas.drawString("" + n.getKey(), n.X() - r, n.Y()- 2 * r);
 
@@ -387,6 +406,7 @@ public class Gui extends JFrame{
     private JCheckBox stepByStepCheckBox;
     private JButton maxMatch_hungarianButton;
     private JPanel buttons_panel;
+    private Paint_panel graph_panel;
     
 
     public Gui(String title, weighted_graph g){
@@ -412,7 +432,7 @@ public class Gui extends JFrame{
 
         this.setJMenuBar(menu_bar);
         
-        Paint_panel graph_panel = new Paint_panel();
+        graph_panel = new Paint_panel();
         JPanel rights_reserved_panel = new JPanel();
         
         JButton addNodeButton = new JButton("Add Node");
@@ -506,15 +526,7 @@ public class Gui extends JFrame{
             
         });
 
-        brooksColoring.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                weighted_graph_algorithms ga = new WGraph_Algo();
-                ga.init(g);
-                ga.BrookColoring();
-                graph_panel.repaint();
-            }
-        });
+        brooksColoring.addActionListener(gh);
 
         rightsReserved.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         rightsReserved.addMouseListener(new MouseAdapter(){
