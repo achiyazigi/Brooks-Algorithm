@@ -266,6 +266,7 @@ public class Brooks_Algo_Util_test {
             int u_color = u.getColor();
             for (node_info v : g.getV(u.getKey())){
                 if(u_color == v.getColor()){
+                    System.out.println(v + " " + v.getColor() + " , " + u + " " + u_color);
                     return false;
                 }
             }
@@ -326,5 +327,37 @@ public class Brooks_Algo_Util_test {
     	
     	ch.removeEdge(0, 1);
     	assertFalse(alg.isClique(ch));
+    }
+
+    @Test
+    public void handleXYZcase(){
+        weighted_graph g = graph_creator(1000);
+        for (int i = 0; i < g.nodeSize(); i++) {
+            connectToAll(g, i);
+        }
+        for (int i = 0; i < g.nodeSize(); i++) {
+            g.removeEdge(i, (i+1)%g.nodeSize());
+        }
+        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        ba.handleXYZcase(g);
+        assertEquals(ba.deltaG(g), g.nodeSize()-3);
+        assertTrue(legalColoring(g));
+        assertTrue(ba.get_highest_color(g) <= ba.deltaG(g));
+
+        g = new WGraph_DS();
+        g = graph_creator(100);
+        for (int i = 0; i < g.nodeSize(); i++) {
+            connectToAll(g, i);
+        }
+        
+        for (int i = 0; i < g.nodeSize(); i++) {
+            g.removeEdge(i, (i+2)%g.nodeSize());
+            g.removeEdge(i, (i+1)%g.nodeSize());
+        }
+        ba = new Brooks_Algo_Util(g);
+        ba.handleXYZcase(g);
+        assertEquals(ba.deltaG(g), g.nodeSize()-5);
+        assertTrue(legalColoring(g));
+        assertTrue(ba.get_highest_color(g) <= ba.deltaG(g));
     }
 }

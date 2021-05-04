@@ -1,7 +1,11 @@
 
 import java.util.*;
 
-
+/**
+ * this class holds the utilities to find and color
+ * a legit node coloring with deltaG colors.
+ * (assuming the graph isn't complete or odd cycle)
+ */
 public class Brooks_Algo_Util {
 
     private weighted_graph g;
@@ -49,6 +53,11 @@ public class Brooks_Algo_Util {
         return res;
     }
 
+    /**
+     * creates a graph from list of keys based on initialized graph: g
+     * @param comp
+     * @return the subgraph of g
+     */
     private weighted_graph createSubGraph(List<Integer> comp) {
         weighted_graph graph_comp = new WGraph_DS();
 
@@ -65,6 +74,11 @@ public class Brooks_Algo_Util {
         return graph_comp;
     }
 
+    /**
+     * simple dfs round, saving the current tree keys in a List
+     * @param n
+     * @return the list of all keys in the tree.
+     */
     private List<Integer> dfs_visit(node_info n) {
         Stack<node_info> nodes = new Stack<>();
         LinkedList<Integer> comp = new LinkedList<>();
@@ -397,6 +411,15 @@ public class Brooks_Algo_Util {
             g.connect(k, node.getKey(), 1);
         }
     }
+
+    /**
+     * performing gridyColoring on 2 parts of subgraph local_g.
+     * if the seperator color is not the same in both parts,
+     * switching colors on the 2nd part is being performed.
+     * @param local_g
+     * @param sep
+     * @throws Exception when the subgraph isn't one connected.
+     */
     protected void handleOneConnected(weighted_graph local_g, int sep) throws Exception{
         HashSet<Integer> sep_nei = new HashSet<>();
         for(node_info n: local_g.getV(sep)){
@@ -422,24 +445,38 @@ public class Brooks_Algo_Util {
         this.GreedyColoring(part_one);
         node_info sep_in_g = g.getNode(sep);
         int root_color = sep_in_g.getColor(); // keep the root's color before coloring the 2nd part
-        int hc1 = get_highest_color(seperated.get(0));
         this.GreedyColoring(part_two);
-        int hc2 = get_highest_color(seperated.get(1));
-        int hc = Math.max(hc1, hc2);
         if(root_color != sep_in_g.getColor()){ // the color of sep came out differently
-            SwitchColorsToFit(seperated.get(1), sep, root_color, hc); // missmatch of colors in 2nd part of local g
+            SwitchColorsToFit(seperated.get(1), sep, root_color); // missmatch of colors in 2nd part of local g
         }
 
     } // - Zigler
 
-    private void SwitchColorsToFit(weighted_graph local_g, int sep, int disired_root_color, int hc) {
-        int factor = disired_root_color - g.getNode(sep).getColor();
+    /**
+     * swap color of sep with disired_root_color's color,
+     * along all nodes in subgraph local_g.
+     * @param local_g
+     * @param sep
+     * @param disired_root_color
+     */
+    private void SwitchColorsToFit(weighted_graph local_g, int sep, int disired_root_color) {
+        int color_to_switch = g.getNode(sep).getColor();
         for (node_info v : local_g.getV()) {
             node_info original_v = g.getNode(v.getKey());
-            original_v.setColor(switch_func(original_v.getColor(), hc, factor));
+            if(original_v.getColor() == color_to_switch){
+                original_v.setColor(disired_root_color);
+            }
+            else if(original_v.getColor() == disired_root_color){
+                original_v.setColor(color_to_switch);
+            }
         }
     }
 
+    /**
+     * for testing
+     * @param local_g
+     * @return highest color in a subgraph local_g
+     */
     public int get_highest_color(weighted_graph local_g) {
         int max = 0;
         for (node_info v : local_g.getV()) {
@@ -451,9 +488,7 @@ public class Brooks_Algo_Util {
         return max;
     }
 
-    private static int switch_func(int color, int hc, int factor) {
-        return (color + factor)%(hc + 1);
-    }
+    
     /**
      * ===from this point:===
      *      kappaG >=2
@@ -498,6 +533,29 @@ public class Brooks_Algo_Util {
         return null;
     }
 
-    protected void handleXYZcase(weighted_graph g){} // - Zigler
+
+    /**
+     * get xyz, change order of tree rooted with x like so:
+     * res := (z,y,.....,x)
+     * color y&z with the color 1,
+     * perform gridyColoring on res.
+     * @param local_g
+     */
+    protected void handleXYZcase(weighted_graph local_g){
+        int[] XYZ = XYZ(local_g);
+        int x = XYZ[0];
+        int y = XYZ[1];
+        int z = XYZ[2];
+        List<Integer> res = spanningTreeOrder(local_g, x);
+        int index_y = res.indexOf(y);
+        int index_z = res.indexOf(z);
+        res.remove(index_y);
+        res.remove(index_z);
+        g.getNode(y).setColor(1);
+        g.getNode(z).setColor(1);
+        res.add(0, y);
+        res.add(0, z);
+        GreedyColoring(res);
+    } // - Zigler
 
 }
