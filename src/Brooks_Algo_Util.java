@@ -117,7 +117,7 @@ public class Brooks_Algo_Util {
             while(setOfNeiColors.contains(color)){color++;}				//find the minimum color not used by a neighbor
             g.getNode(node_id).setColor(color);     // color the node
         }
-    } // - nir; the only func coloring the vx’es
+    }
 
     /***
      * A method that check deltaG of a given graph- which is the max degree from all the node in the graph.
@@ -179,7 +179,7 @@ public class Brooks_Algo_Util {
      * so all it has to do is to arrange the vertices and send them for coloring.
      * @param g - A graph that is a path or an even cycle
      */
-    protected void handleDeltaTwo(weighted_graph g){ // - itai only order considered to Greedy
+    protected void handleDeltaTwo(weighted_graph g){
         List<Integer> nodesOrder;
         if(isEvenCycle(g)){
             nodesOrder = cycleOrder(g);
@@ -291,7 +291,7 @@ public class Brooks_Algo_Util {
      * @param local_g
      * @return a node key with degree less than deltaG, -1 d-regular
      */
-    protected int findRoot(weighted_graph local_g){ // - Zigler
+    protected int findRoot(weighted_graph local_g){
         int delta = this.deltaG(local_g);
         int node_key;
         for(node_info n : local_g.getV()){
@@ -450,7 +450,7 @@ public class Brooks_Algo_Util {
             SwitchColorsToFit(seperated.get(1), sep, root_color); // missmatch of colors in 2nd part of local g
         }
 
-    } // - Zigler
+    }
 
     /**
      * swap color of sep with disired_root_color's color,
@@ -556,6 +556,6 @@ public class Brooks_Algo_Util {
         res.add(0, y);
         res.add(0, z);
         GreedyColoring(res);
-    } // - Zigler
+    }
 
 }
