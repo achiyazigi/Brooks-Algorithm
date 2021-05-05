@@ -15,7 +15,9 @@ public class Brooks_Algo_Util_test {
         g.addNode(2);
         g.addNode(3);
         g.connect(0, 1, 0);
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
         List<weighted_graph> scc = ba.SCC();
         assertEquals(scc.size(), 3);
         g.connect(3, 2, 0);
@@ -28,7 +30,9 @@ public class Brooks_Algo_Util_test {
     @Test
     void deltaG(){
         weighted_graph g=graph_creator(100);
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
         assertEquals(0, ba.deltaG(g));
         g.connect(0,1,1);
         g.connect(0,2,1);
@@ -45,7 +49,9 @@ public class Brooks_Algo_Util_test {
     @Test
     void isOneConnected(){
         weighted_graph g=graph_creator(3);
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
         g.connect(0,1,1);
         g.connect(1,2,1);
         assertEquals(1, ba.isOneConnected(g));
@@ -73,7 +79,9 @@ public class Brooks_Algo_Util_test {
     	List<Integer> order = new LinkedList<Integer>();
     	for(int i = 0; i < 5; i++) {order.add(i);}
     	
-    	Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+    	Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
     	ba.GreedyColoring(order);
     	
     	
@@ -91,7 +99,9 @@ public class Brooks_Algo_Util_test {
     	
     	List<Integer> order1 = new LinkedList<Integer>();
     	order1.add(2); order1.add(1); order1.add(0); order1.add(3);
-    	Brooks_Algo_Util ba1 = new Brooks_Algo_Util(g1);
+    	Brooks_Algo_Util ba1 = new Brooks_Algo_Util();
+        ba1.init(g1);
+
     	ba1.GreedyColoring(order1);
     	
     	assertEquals(3, g1.getNode(0).getColor());
@@ -104,7 +114,9 @@ public class Brooks_Algo_Util_test {
     void XYZ() {
     	
     	weighted_graph g = make_k_n_n(3);
-    	Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+    	Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
     	int[] xyz = ba.XYZ(g);
     	int x = xyz[0], y = xyz[1], z = xyz[2];
     	
@@ -127,7 +139,8 @@ public class Brooks_Algo_Util_test {
             
             connectToAll(g, i);
         }
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
         assertEquals(-1, ba.findRoot(g));
         g.removeEdge(50, 51);
         int root_key = ba.findRoot(g);
@@ -159,7 +172,9 @@ public class Brooks_Algo_Util_test {
             }
         }
 
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
+
         try{ // case1: seperator has the same color in both parts (easy)
 
             ba.handleOneConnected(g, 4);
@@ -295,7 +310,9 @@ public class Brooks_Algo_Util_test {
     	ch.connect(3, 4, 0);
     	ch.connect(4, 5, 0);
     	ch.connect(0, 5, 0);
-    	Brooks_Algo_Util alg = new Brooks_Algo_Util(ch);
+    	Brooks_Algo_Util alg = new Brooks_Algo_Util();
+        alg.init(ch);
+
     	LinkedList<Integer> list = new LinkedList<Integer>();
     	//check if the root return at the last of the linked list
     	list = (LinkedList<Integer>) alg.spanningTreeOrder(ch, 0);
@@ -322,7 +339,9 @@ public class Brooks_Algo_Util_test {
     	ch.connect(2, 1, 0);
     	ch.connect(1, 3, 0);
 
-    	Brooks_Algo_Util alg = new Brooks_Algo_Util(ch);
+    	Brooks_Algo_Util alg = new Brooks_Algo_Util();
+        alg.init(ch);
+
     	assertTrue(alg.isClique(ch));
     	
     	ch.removeEdge(0, 1);
@@ -338,7 +357,8 @@ public class Brooks_Algo_Util_test {
         for (int i = 0; i < g.nodeSize(); i++) {
             g.removeEdge(i, (i+1)%g.nodeSize());
         }
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(g);
         ba.handleXYZcase(g);
         assertEquals(ba.deltaG(g), g.nodeSize()-3);
         assertTrue(legalColoring(g));
@@ -354,7 +374,8 @@ public class Brooks_Algo_Util_test {
             g.removeEdge(i, (i+2)%g.nodeSize());
             g.removeEdge(i, (i+1)%g.nodeSize());
         }
-        ba = new Brooks_Algo_Util(g);
+        ba = new Brooks_Algo_Util();
+        ba.init(g);
         ba.handleXYZcase(g);
         assertEquals(ba.deltaG(g), g.nodeSize()-5);
         assertTrue(legalColoring(g));

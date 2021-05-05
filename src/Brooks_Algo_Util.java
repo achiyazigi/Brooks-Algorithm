@@ -21,8 +21,53 @@ public class Brooks_Algo_Util {
         }
     }
 
-    public Brooks_Algo_Util(weighted_graph g){
+    public void init(weighted_graph g){
         this.g = g;
+    }
+
+    public void updateColoring() throws Exception{
+        List<weighted_graph> components = SCC();
+        for(weighted_graph comp: components){
+            int delta = deltaG(comp);
+            if(delta < 3){ // the component is an even Cycle or a Path
+                if(delta == 2){ // greedy it is!
+                    handleDeltaTwo(comp);
+                }
+                else{
+                    GreedyColoring(arbitrary_order(comp));
+                }
+            }
+            else{ // deltaG >= 3
+                int root = findRoot(comp);
+                if(root >= 0){ // not d-regular
+                    List<Integer> order = spanningTreeOrder(comp, root);
+                    GreedyColoring(order);
+                }
+                else{ // d-regular
+                    if(isClique(comp)){ // clique can be colored with at least deltaG + 1 colors
+                        
+                        GreedyColoring(arbitrary_order(comp));
+                    }
+                    else{ // not cilque, lets examine local connectivuty
+                        int sep = isOneConnected(comp);
+                        if(sep < 0){ // not 1 connected, existence of xyz promised
+                            handleXYZcase(comp);
+                        }
+                        else{ // 1 connected d-regular graph! 
+                            handleOneConnected(comp, sep);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected List<Integer> arbitrary_order(weighted_graph local_g){
+        List<Integer> order = new LinkedList<>();
+        for(node_info node: local_g.getV()){
+            order.add(node.getKey());
+        }
+        return order;
     }
 
     //  ===start of SCC'S functions===
@@ -105,17 +150,19 @@ public class Brooks_Algo_Util {
      */
     protected void GreedyColoring(List<Integer> order){
         int color;
+        reset();
         HashSet<Integer> setOfNeiColors = new HashSet<Integer>();
         for(int node_id : order){   // for each node in the list
             setOfNeiColors.clear();	// make a list of it's neighbors's colors
             for (node_info nei : g.getV(node_id)){
-            	if(order.contains(nei.getKey())) {
+            	if(order.contains(nei.getKey()) && nei.getTag() == 1) {
             		setOfNeiColors.add(nei.getColor());
             	}
             }
             color = 1;
             while(setOfNeiColors.contains(color)){color++;}				//find the minimum color not used by a neighbor
             g.getNode(node_id).setColor(color);     // color the node
+            g.getNode(node_id).setTag(1);
         }
     }
 
@@ -190,7 +237,7 @@ public class Brooks_Algo_Util {
             GreedyColoring(nodesOrder);
         }
         else{
-            throw new IllegalArgumentException("handleDeltaTwo method handle only path and even cycle graph!");
+            GreedyColoring(arbitrary_order(g));
         }
     }
 
@@ -427,7 +474,8 @@ public class Brooks_Algo_Util {
         }
         
         local_g.removeNode(sep);
-        Brooks_Algo_Util ba = new Brooks_Algo_Util(local_g);
+        Brooks_Algo_Util ba = new Brooks_Algo_Util();
+        ba.init(local_g);
         List<weighted_graph> seperated = ba.SCC();
         local_g.addNode(sep);
         if(seperated.size() > 2){

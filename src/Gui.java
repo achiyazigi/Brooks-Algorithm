@@ -254,7 +254,7 @@ public class Gui extends JFrame{
             }
             drawGraph(canvas);
             for (int i : colorPalet) {
-                canvas.setColor(new Color((100 * i)%230,(200 * i)%230,(300 * i)%230));
+                canvas.setColor(new Color((111 * i)%230,(217 * i)%230,(57 * i)%230));
                 canvas.drawOval(20 * i, getHeight() - 30, 10, 10);
             }
         }
