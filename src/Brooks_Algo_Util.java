@@ -45,7 +45,6 @@ public class Brooks_Algo_Util {
                 }
                 else{ // d-regular
                     if(isClique(comp)){ // clique can be colored with at least deltaG + 1 colors
-                        
                         GreedyColoring(arbitrary_order(comp));
                     }
                     else{ // not cilque, lets examine local connectivuty
@@ -209,14 +208,8 @@ public class Brooks_Algo_Util {
      * @param g - graph 
      * @return true - if the graph is clique, otherwise false
      */
-    protected boolean isClique(weighted_graph g){ // - Eviatar
-        int number_neighbrhood = g.getV().size() -1; //in clique graph have number of nodes -1 neigberhoods
-        for(node_info node: g.getV()) {		//move on all the neighberhood
-        	if(g.getV(node.getKey()).size() != number_neighbrhood) {
-        		return false;
-        	}
-        }
-        return true;
+    protected boolean isClique(weighted_graph comp){ // - Eviatar
+        return  comp.edgeSize() == ( comp.nodeSize() * ( comp.nodeSize() - 1 )) / 2 ;
     }
 
     /**

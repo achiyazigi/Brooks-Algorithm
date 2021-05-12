@@ -11,7 +11,6 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -253,6 +252,8 @@ public class Gui extends JFrame{
 
             }
             drawGraph(canvas);
+
+            // drawing the palet
             for (int i : colorPalet) {
                 canvas.setColor(new Color((111 * i)%230,(217 * i)%230,(57 * i)%230));
                 canvas.drawOval(20 * i, getHeight() - 30, 10, 10);
